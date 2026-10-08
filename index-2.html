@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pre-Launch Build Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Layout: one engineering-notebook column. Header, charge gauge, six weekly sheets with three lanes, then a Stock Study Hub reading list filtered by week. Dark-first blueprint navy with copper and teal. */
+  :root {
+    --bg: #0F1B2D;
+    --panel: #16283F;
+    --panel-2: #1C3150;
+    --grid-line: rgba(180, 205, 230, 0.08);
+    --border: rgba(180, 205, 230, 0.16);
+    --text: #E7EEF5;
+    --text-muted: #8CA2B8;
+    --copper: #D98E4A;
+    --copper-dim: rgba(217, 142, 74, 0.18);
+    --teal: #5FC7B8;
+    --teal-dim: rgba(95, 199, 184, 0.16);
+    --done-bg: rgba(127, 191, 127, 0.14);
+    --done-line: #7FBF7F;
+    --danger: #D9705A;
+    --font-display: 'IBM Plex Serif', Georgia, serif;
+    --font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+    color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #EFEAE0;
+      --panel: #FBF8F1;
+      --panel-2: #F3EEE2;
+      --grid-line: rgba(30, 40, 55, 0.07);
+      --border: rgba(30, 40, 55, 0.14);
+      --text: #1C2733;
+      --text-muted: #5B6B7A;
+      --copper: #A15521;
+      --copper-dim: rgba(161, 85, 33, 0.14);
+      --teal: #1E7567;
+      --teal-dim: rgba(30, 117, 103, 0.12);
+      --done-bg: rgba(58, 138, 58, 0.12);
+      --done-line: #3A8A3A;
+      --danger: #B4432F;
+      color-scheme: light;
+    }
+  }
+
+  :root[data-theme="light"] {
+    --bg: #EFEAE0;
+    --panel: #FBF8F1;
+    --panel-2: #F3EEE2;
+    --grid-line: rgba(30, 40, 55, 0.07);
+    --border: rgba(30, 40, 55, 0.14);
+    --text: #1C2733;
+    --text-muted: #5B6B7A;
+    --copper: #A15521;
+    --copper-dim: rgba(161, 85, 33, 0.14);
+    --teal: #1E7567;
+    --teal-dim: rgba(30, 117, 103, 0.12);
+    --done-bg: rgba(58, 138, 58, 0.12);
+    --done-line: #3A8A3A;
+    --danger: #B4432F;
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible { outline: 2px solid var(--copper); outline-offset: 2px; }
+
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding-block: 40px 80px;
+    padding-inline: 20px;
+  }
+
+  header.top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+    margin-bottom: 28px;
+  }
+
+  .title-block { min-width: 0; flex: 1 1 320px; }
+
+  .title-block h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .title-block p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    max-width: 52ch;
+    line-height: 1.55;
+  }
+
+  .top-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .btn {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    padding: 8px 11px;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn:hover { color: var(--text); border-color: var(--copper); }
+  .btn.hub-link { color: var(--teal); border-color: var(--teal); }
+
+  .charge {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 18px 20px;
+    margin-bottom: 36px;
+  }
+
+  .charge-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    font-family: var(--font-mono);
+  }
+  .charge-top span:first-child { font-size: 0.72rem; letter-spacing: 0.04em; color: var(--text-muted); }
+  .charge-top span:last-child { font-size: 0.85rem; color: var(--copper); font-variant-numeric: tabular-nums; }
+
+  .gauge {
+    height: 10px;
+    background: var(--grid-line);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .gauge-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--copper));
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .week {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--panel);
+    margin-bottom: 22px;
+    overflow: hidden;
+  }
+
+  .week-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px 16px;
+    padding: 14px 18px;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .week-head h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .now-tag {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+    color: var(--copper);
+    border: 1px solid var(--copper);
+    border-radius: 3px;
+    padding: 2px 6px;
+  }
+  .week-meta { text-align: right; }
+  .week-meta .dates { color: var(--text-muted); font-family: var(--font-mono); font-size: 0.72rem; }
+  .week-meta .week-progress { color: var(--copper); font-family: var(--font-mono); font-size: 0.72rem; font-variant-numeric: tabular-nums; }
+
+  .lanes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .lane { padding: 16px 18px 18px; min-width: 0; }
+  .lane + .lane { border-left: 1px solid var(--border); }
+
+  @media (max-width: 700px) {
+    .lanes { grid-template-columns: minmax(0, 1fr); }
+    .lane + .lane { border-left: none; border-top: 1px solid var(--border); }
+  }
+
+  .lane-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .lane-label.tech { color: var(--copper); }
+  .lane-label.license { color: var(--danger); }
+  .lane-label.stocks { color: var(--teal); }
+
+  ul.tasks { list-style: none; margin: 0; padding: 0; }
+
+  li.task {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 7px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.86rem;
+    line-height: 1.4;
+    transition: background 0.15s ease;
+  }
+  li.task:hover { background: var(--grid-line); }
+  li.task.done { background: var(--done-bg); }
+  li.task.done span.txt {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--done-line);
+  }
+
+  .box {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    border: 1.5px solid var(--text-muted);
+    border-radius: 3px;
+    position: relative;
+  }
+  li.task.done .box { background: var(--done-line); border-color: var(--done-line); }
+  li.task.done .box::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--panel);
+    border-width: 0 2px 2px 0;
+    transform: rotate(40deg);
+  }
+
+  /* Stock Study Hub */
+  .hub { margin-top: 48px; scroll-margin-top: 16px; }
+  .hub-head h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.3rem, 3vw, 1.65rem);
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+  .hub-head p { margin: 0; color: var(--text-muted); font-size: 0.92rem; line-height: 1.55; max-width: 56ch; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 18px 20px; }
+  .chip-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    padding: 7px 11px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chip-btn:hover { color: var(--text); border-color: var(--teal); }
+  .chip-btn[aria-pressed="true"] { border-color: var(--teal); color: var(--teal); background: var(--teal-dim); }
+  .chip-btn.now::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--copper);
+  }
+
+  .group {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--panel);
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  .group-title {
+    margin: 0;
+    padding: 12px 18px;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--teal);
+  }
+  .res {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 16px;
+    padding: 14px 18px;
+    align-items: start;
+  }
+  .res + .res { border-top: 1px solid var(--border); }
+  .res-main { min-width: 0; }
+  .res a, .res .res-name {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 0.95rem;
+    overflow-wrap: anywhere;
+  }
+  .res a {
+    text-decoration: underline;
+    text-decoration-color: var(--teal);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  .res a:hover { color: var(--teal); }
+  .res p { margin: 4px 0 0; color: var(--text-muted); font-size: 0.86rem; line-height: 1.55; max-width: 64ch; }
+  .wk {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.04em;
+    color: var(--copper);
+    white-space: nowrap;
+    padding-top: 3px;
+  }
+
+  .empty { color: var(--text-muted); font-size: 0.9rem; padding: 12px 0; }
+
+  .safety {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--panel);
+    padding: 16px 18px;
+  }
+  .safety h3 {
+    margin: 0 0 8px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--danger);
+  }
+  .safety p { margin: 0; font-size: 0.88rem; line-height: 1.6; max-width: 66ch; }
+  .safety p + p { margin-top: 8px; color: var(--text-muted); font-size: 0.8rem; }
+  .safety a { color: var(--text); text-decoration-color: var(--danger); text-underline-offset: 3px; }
+
+  .reset-btn { display: block; margin: 40px auto 0; background: transparent; }
+  .reset-btn:hover { color: var(--danger); border-color: var(--danger); }
+  .reset-btn.armed { color: var(--danger); border-color: var(--danger); }
+
+  footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    margin-top: 28px;
+    letter-spacing: 0.04em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gauge-fill, li.task { transition: none; }
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="title-block">
+      <h1>Pre-Launch Build Log</h1>
+      <p>Exams end Sept 25. Dangote work starts in November. Six weeks to get a driver's license, a stock foundation and sharper electronics skills.</p>
+    </div>
+    <div class="top-actions">
+      <a class="btn hub-link" id="hubLink" href="#hub">STOCK HUB &darr;</a>
+      <button class="btn" id="themeToggle" type="button">TOGGLE VIEW</button>
+    </div>
+  </header>
+
+  <div class="charge">
+    <div class="charge-top">
+      <span>OVERALL CHARGE</span>
+      <span id="overallPct">0%</span>
+    </div>
+    <div class="gauge"><div class="gauge-fill" id="overallFill"></div></div>
+  </div>
+
+  <div id="weeks"></div>
+
+  <section class="hub" id="hub">
+    <div class="hub-head">
+      <h2>Stock Study Hub</h2>
+      <p>Picked for Nigerian investors. Filter by week to see what to open next. The dot marks the week you are in.</p>
+    </div>
+
+    <div class="filters" id="filters" role="group" aria-label="Filter resources by week"></div>
+
+    <div id="hubGroups"></div>
+    <p class="empty" id="hubEmpty" hidden>Nothing is tagged for this week. Pick another week or choose All.</p>
+
+    <div class="safety">
+      <h3>CHECK BEFORE YOU DEPOSIT</h3>
+      <p>The SEC keeps a list of registered operators and a page of known investment scams, both under its For Investors menu. If an app is not listed, find out which licensed broker holds your shares before you send any money.</p>
+      <p>Open the <a href="https://www.sec.gov.ng/our-mandate/development/investor-education/" target="_blank" rel="noopener noreferrer">SEC investor education page</a> to start. These are learning links, not investment advice.</p>
+    </div>
+  </section>
+
+  <button class="btn reset-btn" id="resetBtn" type="button">Reset all progress</button>
+
+  <footer>SIX-WEEK RUN &middot; SEPT 25 &rarr; NOV 5 &middot; LICENSE / STOCKS / TECH</footer>
+</div>
+
+<script>
+const DATA = [
+  {
+    title: "Week 1", dates: "Sept 25 – Oct 1",
+    lanes: {
+      tech: ["Set up Arduino IDE + first blink sketch", "Wire up a basic sensor (LDR or button)", "Read up on serial communication basics"],
+      license: ["Register for driving school / book test slot", "Start theory / highway code reading"],
+      stocks: ["Learn what a stock/share actually is", "Understand NGX basics (hours, listing)", "Watch 2–3 beginner market videos"]
+    }
+  },
+  {
+    title: "Week 2", dates: "Oct 2 – 8",
+    lanes: {
+      tech: ["Install KiCad", "Draw first schematic", "Lay out a simple single-sided PCB"],
+      license: ["Begin actual driving lessons", "Practice basic vehicle control"],
+      stocks: ["Learn to read financial statements", "Understand P/E, EPS, dividend yield", "Pick 3 companies to paper-watch"]
+    }
+  },
+  {
+    title: "Week 3", dates: "Oct 9 – 15",
+    lanes: {
+      tech: ["Install LTspice", "Simulate an RC or RL circuit from coursework", "Compare simulated vs. hand-calculated results"],
+      license: ["Continue lessons: parking and turns", "Get comfortable with maneuvers"],
+      stocks: ["Compare Bamboo, Trove and Hisa fees", "Check the broker is licensed, then open an account if ready"]
+    }
+  },
+  {
+    title: "Week 4", dates: "Oct 16 – 22",
+    lanes: {
+      tech: ["Python: NumPy/SciPy basics", "Plot and analyze a simple waveform", "Try a basic FFT on sample data"],
+      license: ["Mock test run-through", "Intensify practice on weak areas"],
+      stocks: ["Learn order types (market vs limit)", "Start a paper-trading log"]
+    }
+  },
+  {
+    title: "Week 5", dates: "Oct 23 – 29",
+    lanes: {
+      tech: ["Port Arduino project to bare C", "Read into microcontroller register-level control"],
+      license: ["Take the driving test"],
+      stocks: ["Study risk management and diversification", "Decide: long-term investor or active trader"]
+    }
+  },
+  {
+    title: "Week 6", dates: "Oct 30 – Nov 5",
+    lanes: {
+      tech: ["Intro to STM32 or ESP32 (light, buffer week)"],
+      license: ["Finalize / collect license if passed"],
+      stocks: ["Place first small real trade if ready", "Review the whole 6 weeks"]
+    }
+  }
+];
+
+const ALL_WEEKS = [1, 2, 3, 4, 5, 6];
+function yt(q) { return "https://www.youtube.com/results?search_query=" + encodeURIComponent(q); }
+
+const HUB = [
+  {
+    title: "OFFICIAL: THE EXCHANGE AND THE REGULATOR",
+    items: [
+      { name: "NGX: Becoming an investor", url: "https://ngxgroup.com/exchange/trade/becoming-an-investor/", weeks: [1, 3],
+        desc: "The exchange's own walkthrough. Pick a licensed broker, complete KYC, then hold your shares through a CSCS account." },
+      { name: "NGX X-Academy", url: "https://ngxgroup.com/exchange/x-academy/", weeks: [1, 2],
+        desc: "Courses such as Capital Market Basics and Bonds & Fixed Income. The page lists no prices, so check the 2026 training calendar or write to x-academy@ngxgroup.com." },
+      { name: "NGX StockTown", url: "https://ngxgroup.com/stocktown/", weeks: [1],
+        desc: "Short illustrated stories about saving and investing. Easy reading for your first day." },
+      { name: "SEC Nigeria: investor education", url: "https://www.sec.gov.ng/our-mandate/development/investor-education/", weeks: [1, 2],
+        desc: "The regulator's investment basics, glossary of market terms, strategies section and webinars." },
+      { name: "SEC Nigeria: tips for investing wisely", url: "https://sec.gov.ng/our-mandate/development/investor-education/investment-strategies/tips-to-investing-wisely-in-the-nigerian-capital-markets", weeks: [5],
+        desc: "Regulator guidance on investing carefully in the Nigerian market. Read it before you settle on a style." },
+      { name: "NGX beginner Spaces on X", weeks: [1],
+        desc: "NGX ran a beginner session called Follow the Fundamentals that drew over 5,000 listeners, and says more are planned. Follow NGX Group on X to catch the next one." }
+    ]
+  },
+  {
+    title: "PICK A PLATFORM",
+    items: [
+      { name: "NGX: find a licensed broker", url: "https://ngxgroup.com/exchange/trade/becoming-an-investor/find-a-broker/", weeks: [3],
+        desc: "The exchange's directory of brokers. Use it to confirm whoever holds your account is real." },
+      { name: "Nairametrics: top investment apps, May 2026", url: "https://nairametrics.com/2026/06/02/top-10-investment-apps-in-in-nigeria-as-of-may-2026/", weeks: [3],
+        desc: "Ranks apps by what each is for. Bamboo and Trove cover Nigerian and US stocks, and Trove starts from N1,000. The star ratings in the article contradict themselves, so use it to shortlist." },
+      { name: "Hisa (formerly Chaka)", url: "https://allafrica.com/stories/202606230635.html", weeks: [3],
+        desc: "Chaka became Hisa in June 2026. It offers Nigerian stocks and ETFs at a flat 1% commission per trade, and old Chaka accounts carried over. Search Hisa in your app store." },
+      { name: "Bamboo Learn", url: "https://learn.investbamboo.com/", weeks: [2, 3],
+        desc: "Free guides from Bamboo on buying Nigerian and US stocks. It is a broker's blog, so read it as a tutorial and compare before you sign up." }
+    ]
+  },
+  {
+    title: "NEWS AND PRICES",
+    items: [
+      { name: "Nairametrics", url: "https://nairametrics.com/", weeks: ALL_WEEKS,
+        desc: "Daily Nigerian market, company and economy news. Read one story a day and note any company you recognize." },
+      { name: "Proshare", url: "https://proshare.co/", weeks: ALL_WEEKS,
+        desc: "More Nigerian capital market news and company announcements, useful for a second opinion." },
+      { name: "NGX website", url: "https://ngxgroup.com/", weeks: [2, 4],
+        desc: "Official listings and market data. Use it to paper-watch your three companies and fill your trading log." }
+    ]
+  },
+  {
+    title: "VIDEOS AND REFERENCES",
+    items: [
+      { name: "The Plain Bagel on YouTube", url: yt("The Plain Bagel"), weeks: [1, 2],
+        desc: "Calm explainers on how markets, ETFs and company financials work. US examples, but the ideas carry over." },
+      { name: "Ben Felix on YouTube", url: yt("Ben Felix Common Sense Investing"), weeks: [5, 6],
+        desc: "Evidence-based long-term investing. Heavier going, so save it for the weeks when you choose a style." },
+      { name: "Investopedia", url: "https://www.investopedia.com/", weeks: [2, 4],
+        desc: "Look up any term you hit: P/E, EPS, dividend yield, limit order." }
+    ]
+  }
+];
+
+const WEEK_STARTS = [new Date(2026, 8, 25), new Date(2026, 9, 2), new Date(2026, 9, 9), new Date(2026, 9, 16), new Date(2026, 9, 23), new Date(2026, 9, 30)];
+const RUN_END = new Date(2026, 10, 6);
+
+function currentWeek() {
+  const now = new Date();
+  if (now < WEEK_STARTS[0] || now >= RUN_END) return 0;
+  let w = 1;
+  for (let i = 0; i < WEEK_STARTS.length; i++) { if (now >= WEEK_STARTS[i]) w = i + 1; }
+  return w;
+}
+const NOW_WEEK = currentWeek();
+
+const STORAGE_KEY = "prelaunch-tracker-v1";
+let state = {};
+try {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  state = raw ? JSON.parse(raw) : {};
+} catch (e) { state = {}; }
+
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+function taskId(weekNo, lane, idx) { return "w" + weekNo + "-" + lane + "-" + idx; }
+
+function toggleTask(id) {
+  state[id] = !state[id];
+  save();
+  render();
+  const el = document.querySelector('[data-id="' + id + '"]');
+  if (el) el.focus();
+}
+
+function render() {
+  const container = document.getElementById("weeks");
+  container.innerHTML = "";
+  let totalTasks = 0, totalDone = 0;
+  const laneOrder = ["tech", "license", "stocks"];
+  const laneLabels = { tech: "TECH SKILLS", license: "DRIVER'S LICENSE", stocks: "STOCKS" };
+
+  DATA.forEach((week, wi) => {
+    const weekNo = wi + 1;
+    let weekTotal = 0, weekDone = 0;
+    let lanesHTML = "";
+
+    laneOrder.forEach(laneKey => {
+      const items = week.lanes[laneKey] || [];
+      let itemsHTML = "";
+      items.forEach((text, idx) => {
+        const id = taskId(weekNo, laneKey, idx);
+        const done = !!state[id];
+        weekTotal++; totalTasks++;
+        if (done) { weekDone++; totalDone++; }
+        itemsHTML += '<li class="task' + (done ? " done" : "") + '" role="checkbox" tabindex="0" aria-checked="' + done + '" data-id="' + id + '">' +
+          '<div class="box"></div><span class="txt">' + text + '</span></li>';
+      });
+      lanesHTML += '<div class="lane"><div class="lane-label ' + laneKey + '">' + laneLabels[laneKey] + '</div><ul class="tasks">' + itemsHTML + '</ul></div>';
+    });
+
+    const pct = weekTotal ? Math.round((weekDone / weekTotal) * 100) : 0;
+    const nowTag = weekNo === NOW_WEEK ? '<span class="now-tag">THIS WEEK</span>' : "";
+
+    const weekEl = document.createElement("div");
+    weekEl.className = "week";
+    weekEl.innerHTML =
+      '<div class="week-head"><h2>' + week.title + nowTag + '</h2>' +
+      '<div class="week-meta"><div class="dates">' + week.dates + '</div>' +
+      '<div class="week-progress">' + weekDone + '/' + weekTotal + ' &middot; ' + pct + '%</div></div></div>' +
+      '<div class="lanes">' + lanesHTML + '</div>';
+    container.appendChild(weekEl);
+  });
+
+  container.querySelectorAll("li.task").forEach(li => {
+    const id = li.getAttribute("data-id");
+    li.addEventListener("click", () => toggleTask(id));
+    li.addEventListener("keydown", ev => {
+      if (ev.key === " " || ev.key === "Enter") { ev.preventDefault(); toggleTask(id); }
+    });
+  });
+
+  const overallPct = totalTasks ? Math.round((totalDone / totalTasks) * 100) : 0;
+  document.getElementById("overallPct").textContent = overallPct + "%";
+  document.getElementById("overallFill").style.width = overallPct + "%";
+}
+
+/* Stock Study Hub */
+let activeWeek = 0;
+
+function weekLabel(weeks) {
+  if (weeks.length === ALL_WEEKS.length) return "ALL WEEKS";
+  return "WK " + weeks.join(", ");
+}
+
+function renderFilters() {
+  const bar = document.getElementById("filters");
+  bar.textContent = "";
+  const opts = [{ n: 0, label: "ALL" }].concat(ALL_WEEKS.map(n => ({ n: n, label: "WK " + n })));
+  opts.forEach(o => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip-btn" + (o.n && o.n === NOW_WEEK ? " now" : "");
+    b.textContent = o.label;
+    b.setAttribute("aria-pressed", String(activeWeek === o.n));
+    b.addEventListener("click", () => { activeWeek = o.n; renderFilters(); renderHub(); });
+    bar.appendChild(b);
+  });
+}
+
+function renderHub() {
+  const mount = document.getElementById("hubGroups");
+  mount.textContent = "";
+  let shown = 0;
+  HUB.forEach(group => {
+    const items = group.items.filter(it => activeWeek === 0 || it.weeks.indexOf(activeWeek) !== -1);
+    if (!items.length) return;
+    shown += items.length;
+    const sec = document.createElement("section");
+    sec.className = "group";
+    const h = document.createElement("h3");
+    h.className = "group-title";
+    h.textContent = group.title;
+    sec.appendChild(h);
+    items.forEach(it => {
+      const row = document.createElement("div");
+      row.className = "res";
+      const main = document.createElement("div");
+      main.className = "res-main";
+      let nameEl;
+      if (it.url) {
+        nameEl = document.createElement("a");
+        nameEl.href = it.url;
+        nameEl.target = "_blank";
+        nameEl.rel = "noopener noreferrer";
+      } else {
+        nameEl = document.createElement("span");
+        nameEl.className = "res-name";
+      }
+      nameEl.textContent = it.name;
+      const p = document.createElement("p");
+      p.textContent = it.desc;
+      main.appendChild(nameEl);
+      main.appendChild(p);
+      const tag = document.createElement("span");
+      tag.className = "wk";
+      tag.textContent = weekLabel(it.weeks);
+      row.appendChild(main);
+      row.appendChild(tag);
+      sec.appendChild(row);
+    });
+    mount.appendChild(sec);
+  });
+  document.getElementById("hubEmpty").hidden = shown > 0;
+}
+
+document.getElementById("hubLink").addEventListener("click", ev => {
+  ev.preventDefault();
+  document.getElementById("hub").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+/* Two-step reset, because confirm() is blocked in the viewer */
+const resetBtn = document.getElementById("resetBtn");
+let resetArmed = false, resetTimer = null;
+function disarmReset() {
+  resetArmed = false;
+  resetBtn.classList.remove("armed");
+  resetBtn.textContent = "Reset all progress";
+}
+resetBtn.addEventListener("click", () => {
+  if (!resetArmed) {
+    resetArmed = true;
+    resetBtn.classList.add("armed");
+    resetBtn.textContent = "Tap again to clear all progress";
+    resetTimer = setTimeout(disarmReset, 4000);
+    return;
+  }
+  clearTimeout(resetTimer);
+  state = {};
+  save();
+  render();
+  disarmReset();
+});
+
+/* Theme toggle */
+const themeToggle = document.getElementById("themeToggle");
+let savedTheme = null;
+try { savedTheme = localStorage.getItem(STORAGE_KEY + "-theme"); } catch (e) {}
+if (savedTheme === "light" || savedTheme === "dark") document.documentElement.setAttribute("data-theme", savedTheme);
+themeToggle.addEventListener("click", () => {
+  let cur = document.documentElement.getAttribute("data-theme");
+  if (!cur) cur = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  const next = cur === "light" ? "dark" : "light";
+  document.documentElement.setAttribute("data-theme", next);
+  try { localStorage.setItem(STORAGE_KEY + "-theme", next); } catch (e) {}
+});
+
+render();
+renderFilters();
+renderHub();
+</script>
+
+</body>
+</html>
